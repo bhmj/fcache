@@ -1,0 +1,5 @@
+/bin/*
+*.mysql
+*.psql
+.env_*
+__debug_bin*

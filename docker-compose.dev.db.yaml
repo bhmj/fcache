@@ -1,0 +1,23 @@
+volumes:
+  db_dev:
+  prometheus_dev:
+
+networks:
+  fcache_net:
+    name: fcache_net
+
+services:
+  postgres:
+    image: "postgres:14-alpine"
+    restart: always
+    ports:
+      - "${CACHE_DB_PORT}:5432" # expose Postgres port to host
+    env_file:
+      - ".env_dev"
+    volumes:
+      - ./geo:/tmp/geo/import:ro
+      - type: volume
+        source: db_dev
+        target: /var/lib/postgresql/data
+    networks:
+      - fcache_net

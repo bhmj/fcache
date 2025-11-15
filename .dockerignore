@@ -1,0 +1,11 @@
+# ignore everything
+*
+
+# allow only needed
+!/go.mod
+!/go.sum
+!/cmd
+!/internal
+!/config
+!/vendor
+!/sql

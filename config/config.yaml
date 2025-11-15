@@ -1,0 +1,17 @@
+app:
+  log_level: info
+  shutdown_delay: 1s
+  http:
+    port: {{CACHE_API_PORT}}
+    stats_port: {{CACHE_STATS_PORT}}
+    metrics:
+      namespace: fcache
+fcache:
+  api_base: api
+  cache_dir: {{CACHE_DIR}}
+  auth_domain: {{AUTH_DOMAIN}}
+  api_token: {{API_TOKEN}}
+  api_token_timeout: 5m
+  dbase:
+    conn_string: host={{CACHE_DB_HOST}} port={{CACHE_DB_PORT}} dbname={{CACHE_DB_NAME}} user={{CACHE_DB_USER}} password={{CACHE_DB_PASSWORD}} sslmode=disable
+    migrations: {{CACHE_DB_MIGRATIONS}}

@@ -1,0 +1,59 @@
+volumes:
+  db_data:
+  prometheus_stage:
+  grafana_stage:
+
+networks:
+  fcache_net:
+    name: fcache_net
+
+services:
+  fcache:
+    user: ${USER}
+    image: "fcache"
+    restart: always
+    command:
+      --config-file=/app/config/config.yaml --print-config=true
+    env_file:
+      - ".env_stage"
+    volumes:
+      - /var/nginx-proxy/domains/${CACHE_DOMAIN}/cache:/var/www/cache
+    depends_on:
+      - postgres
+    networks:
+      - fcache_net
+    extra_hosts:
+      - "combobox.com:host-gateway"
+  postgres:
+    image: "postgres:14-alpine"
+    restart: always
+    env_file:
+      - ".env_stage"
+    volumes:
+      - type: volume
+        source: db_data
+        target: /var/lib/postgresql/data
+    networks:
+      - fcache_net
+  prometheus:
+    image: "prom/prometheus"
+    restart: always
+    volumes:
+      - ./docker-assets/prometheus:/etc/prometheus
+      - type: volume
+        source: prometheus_stage
+        target: /prometheus
+    networks:
+      - fcache_net
+  grafana:
+    image: "grafana/grafana-oss"
+    hostname: fcache-grafana # there can be multiple grafanas and nginx must be able to distinguish them
+    restart: always
+    volumes:
+      - type: volume
+        source: grafana_stage
+        target: /var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - fcache_net
