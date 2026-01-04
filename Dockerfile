@@ -28,4 +28,6 @@ COPY config/ config/
 # sql migrations
 COPY sql/ migrations/
 
+USER ${USER}
+
 ENTRYPOINT ["./fcache"]
