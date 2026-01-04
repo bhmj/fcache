@@ -18,7 +18,11 @@ export TARGET_DISTR_TYPE=alpine
 export TARGET_DISTR_VERSION=latest
 # a user created inside the fcache container
 # files created by those services on mounted volumes will be owned by this user
-export DOCKER_USER=$(USER)
+export DOCKER_USER=fcache
+
+VERSION := $(shell cat version)
+REGISTRY := "registry.combobox.cc"
+REGISTRY_USER := "combobox"
 
 LDFLAGS = -s -w -X main.appVersion=dev-$(shell git rev-parse --short HEAD)-$(shell date +%y-%m-%d-%H%M%S)
 PROJECT = $(shell basename $(PWD))
@@ -39,6 +43,7 @@ some of the <targets> are:
   gosec                - Go security checker
   test                 - run tests
   docker-build         - build docker images
+  release              - release
   db-up                - run the test DB for local development
   db-down              - stop the test DB
   reset-db             - Reset the test DB
@@ -113,8 +118,21 @@ test:
 run:
 	CGO_ENABLED=0 go run -ldflags "$(LDFLAGS)" -trimpath $(SRC) --config-file=config/config.yaml
 
-docker-image:
-	docker build --tag fcache --target fcache $(DOCKER_PARAMS) .
+docker-build:
+	docker build --platform $(DOCKER_GOOS)/$(DOCKER_GOARCH) --tag $(REGISTRY)/fcache:$(VERSION) --target fcache $(DOCKER_PARAMS) .
+
+docker-login:
+	@echo "Logging into Docker Hub..."
+	docker login --username "$(REGISTRY_USER)" $(REGISTRY)
+
+release:
+	echo "Pushing image..."
+	docker push $(REGISTRY)/fcache:$(VERSION)
+	printf "\n$(REGISTRY)/fcache:$(VERSION) released successfully\n\n";
+	printf "Bumping version... "
+	NEW_VERSION=$$(awk -F. '{printf "%d.%d\n",$$1,$$2+1}' version); \
+	echo "$$NEW_VERSION" > version; \
+	echo "Done."
 
 db-up:
 	$(call load_env,.env_dev,db-up-run)
@@ -155,6 +173,6 @@ down:
 cake:
 	printf "%b\n" "$$CAKE"
 
-.PHONY: all build run lint test gosec docker-image update-deps db-up db-down dev-up stage-up prod-up down cake
+.PHONY: all build run lint test gosec docker-build update-deps db-up db-down dev-up stage-up prod-up down cake
 
 $(V).SILENT:
