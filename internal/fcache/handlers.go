@@ -56,6 +56,11 @@ func (s *Service) getFileContent(url string) (body []byte, contentType string, e
 // StreamFile normally returns a cached file as a response, but also can return a cached filename.
 // Used from main page, so auth is required.
 func (s *Service) StreamFile(w http.ResponseWriter, r *http.Request) (int, error) {
+	for name, values := range r.Header {
+		for _, value := range values {
+			s.logger.Info("header", log.String(name, value))
+		}
+	}
 	// check service cookie
 	serviceCookie, err := r.Cookie("XID")
 	if err != nil {
