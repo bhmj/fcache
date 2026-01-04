@@ -14,7 +14,7 @@ func FcacheFactory(config any, options app.Options) (app.Service, error) {
 	cfg, _ := config.(*fcache.Config)
 	svc, err := fcache.New(cfg, options.Logger, options.MetricsRegistry, options.ServiceReporter, options.Production)
 	if err != nil {
-		return nil, fmt.Errorf("create cman service: %w", err)
+		return nil, fmt.Errorf("init service: %w", err)
 	}
 	return svc, nil
 }
