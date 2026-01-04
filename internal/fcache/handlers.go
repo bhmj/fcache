@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/bhmj/goblocks/httpreply"
+	"github.com/bhmj/goblocks/log"
 )
 
 const (
@@ -58,15 +59,18 @@ func (s *Service) StreamFile(w http.ResponseWriter, r *http.Request) (int, error
 	// check service cookie
 	serviceCookie, err := r.Cookie("XID")
 	if err != nil {
+		s.logger.Error("no service cookie", log.Error(err))
 		return httpreply.Error(w, errInvalidRequest, http.StatusUnauthorized) //nolint:wrapcheck
 	}
 	if !s.isTokenValid(serviceCookie.Value) {
+		s.logger.Error("invalid service cookie")
 		return httpreply.Error(w, errInvalidRequest, http.StatusUnauthorized) //nolint:wrapcheck
 	}
 
 	// check arguments
 	urls, found := r.Form["url"] // GET argument
 	if !found {
+		s.logger.Error("no url argument")
 		return httpreply.Error(w, errInvalidRequest, http.StatusBadRequest) //nolint:wrapcheck
 	}
 	url := urls[0]
@@ -77,6 +81,7 @@ func (s *Service) StreamFile(w http.ResponseWriter, r *http.Request) (int, error
 		mode = modes[0]
 	}
 	if mode != responseModeURL && mode != responseModeContent {
+		s.logger.Error("invalid mode", log.String("mode", mode))
 		return httpreply.Error(w, errInvalidRequest, http.StatusBadRequest) //nolint:wrapcheck
 	}
 
