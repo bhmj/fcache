@@ -2,8 +2,8 @@
 
 ## What is it?
 
-FCache is a simple but useful service implementing file cache. It is intended to work as a helper service for traffic-intense
-applications. It can respond with an actual file contents or publicly-available URL. 
+FCache is a simple but useful service implementing file cache (caching proxy). It is intended to work as a helper service for
+traffic-intense applications. It can respond with an actual file contents or publicly-available URL. 
 
 ## Changelog
 
