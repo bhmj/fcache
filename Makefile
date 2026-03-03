@@ -122,7 +122,7 @@ docker-build:
 	docker build --platform $(DOCKER_GOOS)/$(DOCKER_GOARCH) --tag $(REGISTRY)/fcache:$(VERSION) --target fcache $(DOCKER_PARAMS) .
 
 docker-login:
-	@echo "Logging into Docker Hub..."
+	@echo "Logging in to Image Registry"
 	docker login --username "$(REGISTRY_USER)" $(REGISTRY)
 
 release:
